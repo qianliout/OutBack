@@ -1,4 +1,6 @@
 [
   "table-editor-obsidian",
-  "obsidian-linter"
+  "obsidian-linter",
+  "obsidian-git",
+  "obsidian-excalidraw-plugin"
 ]

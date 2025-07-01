@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Deep/Base/InterviewAnswer.md",
+                "file": "Deep/transformer/多头注意力.md",
                 "mode": "preview",
                 "source": true
               },
               "icon": "lucide-file",
-              "title": "InterviewAnswer"
+              "title": "多头注意力"
             }
           }
         ]
@@ -142,17 +142,27 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Deep/Base/InterviewAnswer.md",
+                "file": "Deep/transformer/多头注意力.md",
                 "followCursor": true,
                 "showSearch": true,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "InterviewAnswer 的大纲"
+              "title": "多头注意力 的大纲"
+            }
+          },
+          {
+            "id": "e3837dda5d7be907",
+            "type": "leaf",
+            "state": {
+              "type": "git-view",
+              "state": {},
+              "icon": "git-pull-request",
+              "title": "Source Control"
             }
           }
         ],
-        "currentTab": 3
+        "currentTab": 4
       }
     ],
     "direction": "horizontal",
@@ -166,14 +176,20 @@
       "daily-notes:打开/创建今天的日记": false,
       "templates:插入模板": false,
       "command-palette:打开命令面板": false,
-      "table-editor-obsidian:Advanced Tables Toolbar": false
+      "table-editor-obsidian:Advanced Tables Toolbar": false,
+      "obsidian-git:Open Git source control": false,
+      "obsidian-excalidraw-plugin:新建绘图文件": false
     }
   },
   "active": "0c7518511e4d5d28",
   "lastOpenFiles": [
+    "Excalidraw/Drawing 2025-07-01 22.20.34.excalidraw.md",
+    "Deep/transformer/多头注意力.md",
+    "Excalidraw",
+    "Deep/Base/README.md",
+    "Deep/Base/InterviewAnswer.md",
     "README.md",
     "Deep/review2/propt.md",
-    "Deep/Base/InterviewAnswer.md",
     "Deep/review2/00.md",
     "Deep/review2/transformer_series.md",
     "Deep/review2/gpt.md",
@@ -194,9 +210,6 @@
     "Deep/review/幻觉.md",
     "Deep/review/二面.md",
     "Deep/review/中文分词.md",
-    "Deep/review/知识蒸馏.md",
-    "Deep/review/字节面试题.md",
-    "Deep/review/数据集.md",
     "Deep/review2",
     "Deep/ai/cleanup.py",
     "Deep/ai/update_links.py",
@@ -205,7 +218,6 @@
     "Deep/ai/ai_note/10_面试与实战",
     "Deep/ai/ai_note/09_RAG与检索增强",
     "Deep/ai/ai_note/08_评估与正则化",
-    "Deep/ai/ai_note/07_优化算法与训练技巧",
-    "Deep/ai/ai_note/06_PyTorch操作与技巧"
+    "Deep/ai/ai_note/07_优化算法与训练技巧"
   ]
 }

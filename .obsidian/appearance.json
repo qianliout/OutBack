@@ -1,7 +1,8 @@
 {
-  "cssTheme": "Dracula for Obsidian",
-  "baseFontSize": 11,
+  "cssTheme": "",
+  "baseFontSize": 16,
   "interfaceFontFamily": "Roboto Mono Thin for Powerline",
   "monospaceFontFamily": "Roboto Mono Thin for Powerline",
-  "accentColor": ""
+  "accentColor": "",
+  "translucency": true
 }

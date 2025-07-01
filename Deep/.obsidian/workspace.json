@@ -1,0 +1,205 @@
+{
+  "main": {
+    "id": "31b138bdac5ef631",
+    "type": "split",
+    "children": [
+      {
+        "id": "07f7e0826eb9994b",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "423859bcd27f8795",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "prote.md",
+                "mode": "preview",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "prote"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "cdee3c6864d5497f",
+    "type": "split",
+    "children": [
+      {
+        "id": "6e558cb7cbb9af68",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "530d563d79fe9971",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "文件列表"
+            }
+          },
+          {
+            "id": "daf50901476ed0f1",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "搜索"
+            }
+          },
+          {
+            "id": "871ab3c8dd51284e",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "书签"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "8ae7a834dfb729d4",
+    "type": "split",
+    "children": [
+      {
+        "id": "8292a2f663f919ff",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "c03b8c73e4207913",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "collapseAll": true,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "反向链接"
+            }
+          },
+          {
+            "id": "35bb6ae2435ce7a7",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "出链"
+            }
+          },
+          {
+            "id": "895518d44d8e54ee",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "标签"
+            }
+          },
+          {
+            "id": "48af0f171db467cb",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "transformer_comprehensive_guide.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "transformer_comprehensive_guide 的大纲"
+            }
+          }
+        ],
+        "currentTab": 3
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:打开快速切换": false,
+      "graph:查看关系图谱": false,
+      "canvas:新建白板": false,
+      "daily-notes:打开/创建今天的日记": false,
+      "templates:插入模板": false,
+      "command-palette:打开命令面板": false
+    }
+  },
+  "active": "530d563d79fe9971",
+  "lastOpenFiles": [
+    "review/进阶.md",
+    "review/面试真题.md",
+    "review/类别不平衡.md",
+    "review/评估方式.md",
+    "review/知识蒸馏.md",
+    "review/算法题.md",
+    "review/模型评估.md",
+    "review/幻觉.md",
+    "review/文本相似度.md",
+    "review/微调.md",
+    "review/数据集.md",
+    "review/如何分析模型的错误案例（Error Analysis）？.md",
+    "review/字节面试题.md",
+    "review/伦理.md",
+    "review/基础.md",
+    "review/不同 mask 的作用.md",
+    "review/中文分词.md",
+    "review/二面.md",
+    "review/t5.md",
+    "review/rnn相关.md",
+    "review/rag相关的面试真题.md",
+    "review/rag.md",
+    "review/nlp核心任务.md",
+    "review/nlp常见面试题.md",
+    "review/mcpserver如何做权限验证.md",
+    "review/langchain.md",
+    "review",
+    "ai/pytorch中Liner类的用法.note.pdf",
+    "ai/环境准备.note.pdf",
+    "ai/dim=2.note.pdf",
+    "ai/全链接层.note.pdf",
+    "ai",
+    "transformer"
+  ]
+}

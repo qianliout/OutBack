@@ -1,0 +1,211 @@
+{
+  "main": {
+    "id": "cc3675db4fc62ebc",
+    "type": "split",
+    "children": [
+      {
+        "id": "03640e565ff95d8d",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "0c7518511e4d5d28",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Deep/review2/InterviewAnswer.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "InterviewAnswer"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "22d911187fc21290",
+    "type": "split",
+    "children": [
+      {
+        "id": "fd1ddce9c3795536",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "43c65a20439f4838",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "文件列表"
+            }
+          },
+          {
+            "id": "3d5c9de5066d667e",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "搜索"
+            }
+          },
+          {
+            "id": "bea2b9e54211b7e4",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "书签"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "e78e54cc7519bfbd",
+    "type": "split",
+    "children": [
+      {
+        "id": "b66fbd3327476558",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "e1903d0235bb45af",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "Deep/review2/InterviewAnswer.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "InterviewAnswer 的反向链接列表"
+            }
+          },
+          {
+            "id": "4260c414c57074ad",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "DeepLeaning/transformer/动态批处理.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "动态批处理 的出链列表"
+            }
+          },
+          {
+            "id": "78ec01687a5ba633",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "标签"
+            }
+          },
+          {
+            "id": "79dc12c79e5c2aa9",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "Deep/review2/InterviewAnswer.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "InterviewAnswer 的大纲"
+            }
+          }
+        ],
+        "currentTab": 3
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:打开快速切换": false,
+      "graph:查看关系图谱": false,
+      "canvas:新建白板": false,
+      "daily-notes:打开/创建今天的日记": false,
+      "templates:插入模板": false,
+      "command-palette:打开命令面板": false,
+      "table-editor-obsidian:Advanced Tables Toolbar": false
+    }
+  },
+  "active": "0c7518511e4d5d28",
+  "lastOpenFiles": [
+    "Deep/review2/propt.md",
+    "Deep/review2/InterviewAnswer.md",
+    "Deep/review2/00.md",
+    "Deep/review2/transformer_series.md",
+    "Deep/review2/gpt.md",
+    "Deep/review2/bert.md",
+    "Deep/rag/prote.md",
+    "Deep/review2/05_高级主题与面试准备.md",
+    "Deep/review2/04_NLP核心任务.md",
+    "Deep/review2/03_检索增强生成RAG.md",
+    "Deep/review2/02_模型微调与优化.md",
+    "Deep/review2/01_基础模型架构.md",
+    "Deep/review2/00_知识点总览.md",
+    "Deep/基础知识/07_优化算法与训练技巧.md",
+    "Deep/基础知识/06_PyTorch操作与技巧.md",
+    "Deep/ai/边际概率.md",
+    "Deep/ai/按元素凸结合.md",
+    "Deep/基础知识/02_神经网络架构.md",
+    "Deep/基础知识/01_深度学习基础.md",
+    "Deep/review/幻觉.md",
+    "Deep/review/二面.md",
+    "Deep/review/中文分词.md",
+    "Deep/review/知识蒸馏.md",
+    "Deep/review/字节面试题.md",
+    "Deep/review/数据集.md",
+    "Deep/review/伦理.md",
+    "Deep/review2",
+    "Deep/ai/cleanup.py",
+    "Deep/ai/update_links.py",
+    "Deep/ai/ai_note/original_to_merged_map.json",
+    "Deep/ai/merge_and_map.py",
+    "Deep/ai/ai_note/10_面试与实战",
+    "Deep/ai/ai_note/09_RAG与检索增强",
+    "Deep/ai/ai_note/08_评估与正则化",
+    "Deep/ai/ai_note/07_优化算法与训练技巧",
+    "Deep/ai/ai_note/06_PyTorch操作与技巧"
+  ]
+}

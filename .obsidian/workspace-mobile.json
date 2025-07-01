@@ -1,0 +1,206 @@
+{
+  "main": {
+    "id": "d85fcd59280da1d4",
+    "type": "split",
+    "children": [
+      {
+        "id": "57b4ab73c3f88b48",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "95d22b528d9ea1f3",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Deep/基础知识/01_深度学习基础.md",
+                "mode": "preview",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "01_深度学习基础"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "c6bc0cdabc854884",
+    "type": "mobile-drawer",
+    "children": [
+      {
+        "id": "a0db7b2b22e3d796",
+        "type": "leaf",
+        "state": {
+          "type": "file-explorer",
+          "state": {
+            "sortOrder": "alphabetical",
+            "autoReveal": false
+          },
+          "icon": "lucide-folder-closed",
+          "title": "文件列表"
+        }
+      },
+      {
+        "id": "d302785dc10a5ab0",
+        "type": "leaf",
+        "state": {
+          "type": "search",
+          "state": {
+            "query": "",
+            "matchingCase": false,
+            "explainSearch": false,
+            "collapseAll": false,
+            "extraContext": false,
+            "sortOrder": "alphabetical"
+          },
+          "icon": "lucide-search",
+          "title": "搜索"
+        }
+      },
+      {
+        "id": "120d5b1b1c5942ef",
+        "type": "leaf",
+        "state": {
+          "type": "tag",
+          "state": {
+            "sortOrder": "frequency",
+            "useHierarchy": true,
+            "showSearch": false,
+            "searchQuery": ""
+          },
+          "icon": "lucide-tags",
+          "title": "标签"
+        }
+      },
+      {
+        "id": "ad6f0b48ca737238",
+        "type": "leaf",
+        "state": {
+          "type": "bookmarks",
+          "state": {},
+          "icon": "lucide-bookmark",
+          "title": "书签"
+        }
+      }
+    ],
+    "currentTab": 0
+  },
+  "right": {
+    "id": "6d1888326a0686e2",
+    "type": "mobile-drawer",
+    "children": [
+      {
+        "id": "67370d2e00335e37",
+        "type": "leaf",
+        "state": {
+          "type": "backlink",
+          "state": {
+            "file": "DeepLeaning/transformer/T5.md",
+            "collapseAll": false,
+            "extraContext": false,
+            "sortOrder": "alphabetical",
+            "showSearch": false,
+            "searchQuery": "",
+            "backlinkCollapsed": false,
+            "unlinkedCollapsed": true
+          },
+          "icon": "links-coming-in",
+          "title": "反向链接"
+        }
+      },
+      {
+        "id": "f3134e8f70dcc427",
+        "type": "leaf",
+        "state": {
+          "type": "outgoing-link",
+          "state": {
+            "file": "DeepLeaning/transformer/T5.md",
+            "linksCollapsed": false,
+            "unlinkedCollapsed": true
+          },
+          "icon": "links-going-out",
+          "title": "出链"
+        }
+      },
+      {
+        "id": "aa8ec091f5d2bdd8",
+        "type": "leaf",
+        "state": {
+          "type": "outline",
+          "state": {
+            "file": "DeepLeaning/transformer/T5.md",
+            "followCursor": false,
+            "showSearch": false,
+            "searchQuery": ""
+          },
+          "icon": "lucide-list",
+          "title": "大纲"
+        }
+      },
+      {
+        "id": "ab38d6633407ed33",
+        "type": "leaf",
+        "state": {
+          "type": "advanced-tables-toolbar",
+          "state": {},
+          "icon": "spreadsheet",
+          "title": "Advanced Tables"
+        }
+      }
+    ],
+    "currentTab": 3
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:打开快速切换": false,
+      "graph:查看关系图谱": false,
+      "canvas:新建白板": false,
+      "daily-notes:打开/创建今天的日记": false,
+      "templates:插入模板": false,
+      "command-palette:打开命令面板": false,
+      "table-editor-obsidian:Advanced Tables Toolbar": false
+    }
+  },
+  "active": "95d22b528d9ea1f3",
+  "lastOpenFiles": [
+    "Deep/基础知识/02_神经网络架构.md",
+    "Deep/基础知识/01_深度学习基础.md",
+    "Deep/基础知识/10_面试与实战.md",
+    "Deep/transformer/标签平滑.md",
+    "Deep/基础知识/06_PyTorch操作与技巧.md",
+    "Deep/review2/InterviewAnswer.md",
+    "Deep/基础知识/09_RAG与检索增强.md",
+    "Deep/基础知识/05_NLP核心任务.md",
+    "Deep/基础知识/04_预训练模型.md",
+    "Deep/基础知识/08_评估与正则化.md",
+    "Deep/基础知识/03_Transformer与注意力机制.md",
+    "Deep/基础知识/07_优化算法与训练技巧.md",
+    "Deep/ai/cleanup.py",
+    "Deep/rag/检索策略与算法.md",
+    "Deep/ai/ai_note/04_预训练模型/BERT详解.md",
+    "Deep/rag/prote.md",
+    "Deep/ai/ai_note/04_预训练模型/T5详解.md",
+    "Deep/ai/ai_note/05_NLP核心任务/NLP核心任务详解.md",
+    "Deep/rag/RAG系统基础概念.md",
+    "Deep/rag/工程实践.md",
+    "Deep/ai/ai_note/02_神经网络架构/RNN系列详解.md",
+    "Deep/ai/ai_note/07_优化算法与训练技巧/优化算法详解.md",
+    "Deep/ai/ai_note/08_评估与正则化/类别不平衡处理详解.md",
+    "Deep/ai/ai_note/README.md",
+    "Deep/ai/propt.md",
+    "Deep/ai/ai_note/06_PyTorch操作与技巧/数据加载与处理详解.md",
+    "Deep/ai/ai_note/07_优化算法与训练技巧/权重初始化详解.md",
+    "Deep/ai/ai_note/02_神经网络架构",
+    "Deep/ai/ai_note/10_面试与实战",
+    "Deep/ai/ai_note/05_NLP核心任务",
+    "Deep/ai/ai_note/04_预训练模型",
+    "Deep/ai/ai_note/08_评估与正则化",
+    "Deep/ai/ai_note/03_Transformer与注意力机制",
+    "Deep/ai/ai_note/06_PyTorch操作与技巧",
+    "Deep/ai/ai_note/09_RAG与检索增强",
+    "Deep/ai/ai_note/07_优化算法与训练技巧"
+  ]
+}

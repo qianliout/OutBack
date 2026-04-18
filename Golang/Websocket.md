@@ -237,3 +237,323 @@
 > 💡 **最后提醒**：  
 > WebSocket 是**HTTP 的优雅延伸**，而非“全新协议”。  
 > 在 AI Agent 时代，**Streamable HTTP 已成为更优解**，但理解 WebSocket 仍是成为通信专家的必经之路。
+
+---
+
+## 六、源码级深度剖析：基于 x/net/websocket
+*(源码路径：`golang.org/x/net/websocket`)*
+
+### 6.1 怎么建立连接 (Handshake)
+WebSocket 连接的建立本质上是一个 HTTP 升级过程。`x/net/websocket` 通过劫持 (Hijack) 原始 HTTP 连接来实现。
+
+**关键源码 (`server.go`)**：
+```go
+func (s Server) serveWebSocket(w http.ResponseWriter, req *http.Request) {
+    // 1. 劫持底层的 TCP 连接，脱离 HTTP 框架的控制
+    rwc, buf, err := w.(http.Hijacker).Hijack()
+    if err != nil {
+        panic("Hijack failed: " + err.Error())
+    }
+    defer rwc.Close()
+    
+    // 2. 执行握手协议，校验 HTTP 头中的 Upgrade 和 Sec-WebSocket-Key
+    conn, err := newServerConn(rwc, buf, req, &s.Config, s.Handshake)
+    if err != nil {
+        return
+    }
+    
+    // 3. 将包装好的 websocket.Conn 交给应用层的 Handler 处理
+    s.Handler(conn)
+}
+```
+**`hybi.go` 握手校验**：
+```go
+// 校验连接头，并计算 Sec-WebSocket-Accept 响应给客户端
+func getNonceAccept(nonce []byte) (expected []byte, err error) {
+    h := sha1.New()
+    h.Write(nonce)
+    h.Write([]byte(websocketGUID)) // 追加魔数 "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
+    expected = make([]byte, 28)
+    base64.StdEncoding.Encode(expected, h.Sum(nil))
+    return
+}
+```
+
+### 6.2 怎么处理与管理连接 (Conn & Handler)
+连接建立后，底层的 `net.Conn` (即 `io.ReadWriteCloser`) 会被封装为 `websocket.Conn`。
+
+**关键源码 (`websocket.go`)**：
+```go
+// Conn 代表一个 WebSocket 连接
+type Conn struct {
+    config  *Config
+    request *http.Request
+
+    buf *bufio.ReadWriter
+    rwc io.ReadWriteCloser // 底层的 TCP socket 连接
+
+    rio sync.Mutex // 读锁：保证并发读取时的帧边界完整
+    wio sync.Mutex // 写锁：保证并发写入时不会发生帧交错
+
+    PayloadType byte
+    // ...
+}
+```
+> 💡 **连接管理说明**：`x/net/websocket` 并未提供全局的连接池或管理机制。开发者需要在应用层通过 `map[*websocket.Conn]struct{}` 配合 `sync.Mutex` 自行管理所有活跃连接。
+
+### 6.3 怎么 Read 和 Write 数据 (数据收发)
+WebSocket 的数据是以 Frame（帧）的形式传输的。框架层会将用户的字节流打包成帧，或将帧拆解为字节流。
+
+**Read 关键源码 (`hybi.go`)**：
+```go
+// 读取帧的 Payload 数据，并实时解码掩码 (Unmask)
+func (frame *hybiFrameReader) Read(msg []byte) (n int, err error) {
+    n, err = frame.reader.Read(msg)
+    if frame.header.MaskingKey != nil {
+        // 根据 RFC 规定，客户端发往服务端的数据必须 Mask（掩码）
+        // 这里通过异或运算 (XOR) 还原真实数据
+        for i := 0; i < n; i++ {
+            msg[i] = msg[i] ^ frame.header.MaskingKey[frame.pos%4]
+            frame.pos++
+        }
+    }
+    return n, err
+}
+```
+
+**Write 关键源码 (`hybi.go`)**：
+```go
+// 将应用层数据打包为 WebSocket 帧写入 TCP 缓冲区
+func (frame *hybiFrameWriter) Write(msg []byte) (n int, err error) {
+    var header []byte
+    // ... 构建 2-14 字节的 Frame Header (包括 FIN, Opcode, Payload Len) ...
+    
+    // 写入 Header
+    frame.writer.Write(header)
+    // 写入真实数据 Payload
+    frame.writer.Write(msg)
+    // 强制刷入底层 TCP Socket
+    err = frame.writer.Flush()
+    return length, err // 注意：这里是同步阻塞的，直到 TCP 缓冲区完全接受
+}
+```
+
+### 6.4 Read/Write 时怎么处理 Socket 的异步数据
+在 Go 语言中，底层的 Socket 是**非阻塞的 (Non-blocking)**，由 Go runtime 的 **netpoller (epoll/kqueue)** 异步处理。
+
+> 💡 **底层网络描述符 (netFD) 机制**：
+> `net.Listen("tcp", ":8888")` 返回的 `*TCPListener` 和 `listener.Accept()` 接收的新连接 `*TCPConn`，底层都是基于 `netFD`（网络描述符，类似于 Linux 的文件描述符）进行操作的。
+> `netFD` 包含一个核心的 `poll.FD` 数据结构，它内部有两个关键字段：
+> 1. **Sysfd**：真正的系统文件描述符（系统内核层面）。
+> 2. **pollDesc**：对底层事件驱动（epoll/kqueue）的封装。
+> 所有的读写、超时等操作，本质上都是通过调用 `pollDesc` 的对应方法，与 runtime 的 netpoller 交互实现的。
+
+但在应用层，`websocket.Conn` 暴露的是**同步阻塞 API**。为了实现全双工的“异步”处理，我们必须在应用层使用 **Goroutine 读写分离模型**：
+
+```go
+// 典型应用层异步处理模式
+func EchoHandler(ws *websocket.Conn) {
+    // 启动异步写协程 (Write Pump)
+    go func() {
+        for msg := range sendCh {
+            ws.Write(msg) // wio.Lock() 保证线程安全
+        }
+    }()
+
+    // 阻塞读循环 (Read Pump)
+    for {
+        var msg []byte
+        // 这里底层会调用 epoll_wait 挂起当前 Goroutine，直到 Socket 有数据可读
+        // 不会阻塞整个 OS 线程，实现了极高的并发
+        n, err := ws.Read(msg) 
+        if err != nil {
+            break
+        }
+        // 将读取到的异步数据推入通道，交由业务逻辑处理
+        processCh <- msg[:n]
+    }
+}
+```
+> 💡 **核心机制**：通过 `ws.rio.Lock()` 和 `ws.wio.Lock()` 分离了读写锁。这意味着你可以**在一个 Goroutine 中阻塞 Read 的同时，在另一个 Goroutine 中并发 Write**，互不干扰，完美适配 Socket 的全双工异步特性。
+
+### 6.5 怎么保活 (Keep-Alive)
+WebSocket 通过 Ping/Pong 控制帧进行保活。在 `x/net/websocket` 中，控制帧的读取是**寄生在普通 Read 流程中**的。
+
+**关键源码 (`hybi.go`)**：
+```go
+func (handler *hybiFrameHandler) HandleFrame(frame frameReader) (frameReader, error) {
+    switch frame.PayloadType() {
+    case PingFrame, PongFrame:
+        // 拦截到 Ping/Pong 控制帧
+        b := make([]byte, maxControlFramePayloadLength)
+        n, err := io.ReadFull(frame, b)
+        
+        if frame.PayloadType() == PingFrame {
+            // 如果收到 Ping，自动回复 Pong
+            handler.WritePong(b[:n]) 
+        }
+        // 返回 nil 告诉上层这不是业务数据帧，继续等待下一个帧
+        return nil, nil
+    }
+    return frame, nil
+}
+```
+> ⚠️ **致命缺陷**：因为保活处理寄生在 `Read` 中，如果应用层长时间不调用 `ws.Read()`（例如业务阻塞），底层的 Ping 就无法被处理，导致连接假死。生产环境中必须有一个 Goroutine 处于死循环 `Read` 状态！
+
+### 6.6 怎么做背压 (Backpressure)
+在 `x/net/websocket` 中，背压并不是自动完成的，而是依赖于**底层的网络超时机制 (Deadline)** 和 **Go 通道 (Channel)** 组合实现。
+
+**关键源码 (`websocket.go`)**：
+```go
+// SetWriteDeadline 设置网络写入超时时间
+func (ws *Conn) SetWriteDeadline(t time.Time) error {
+    if conn, ok := ws.rwc.(net.Conn); ok {
+        return conn.SetWriteDeadline(t)
+    }
+    return errSetDeadline
+}
+```
+
+**应用层背压实现逻辑**：
+当客户端处理缓慢时，服务端的 TCP 发送缓冲区会被填满，导致 `ws.Write()` 阻塞。如果不做背压，服务端会积压大量 Goroutine 导致 OOM。
+```go
+func writePump(ws *websocket.Conn) {
+    for msg := range sendCh { // sendCh 必须是有界缓冲 (如 make(chan []byte, 256))
+        // 1. 设置写入超时时间，这是背压的关键！
+        ws.SetWriteDeadline(time.Now().Add(10 * time.Second))
+        
+        // 2. 如果客户端消费慢，TCP 窗口满，Write 会阻塞。
+        // 超时后 Write 返回 error，强制断开这个“慢连接”。
+        if _, err := ws.Write(msg); err != nil {
+            ws.Close()
+            return
+        }
+    }
+}
+```
+> 💡 **背压总结**：通过 **有界 Channel + SetWriteDeadline 超时控制**。如果 Channel 满了（业务层背压），或者网络写入超时（网络层背压），直接抛弃连接，从而保护服务端内存。
+
+---
+
+## 七、百万级 WebSocket 高并发架构实践 (Go 1.25+ 视角)
+
+> **背景说明**：基于 Sergey Kamardin 的百万级 WebSocket 经典实践，结合 Go 1.25+ 时代的调度器（Scheduler）、内存分配器（Allocator）以及 GC 进化，进行现代视角的重构与优化。
+
+### 7.1 业务背景与架构挑战
+
+- **核心诉求**：实现一个 Publisher-Subscriber 系统，用于实时推送状态变更。
+- **面临挑战**：单机同时维持约 **3,000,000** 个长期存活但极少通信的空闲连接（Idle Connections）。
+
+### 7.2 惯用做法的性能陷阱 (Idiomatic Go)
+
+如果使用标准库 `net/http` 和双 Goroutine 模型（一读一写），在 **Go 1.25+** 中 300 万连接的开销如下：
+
+1. **Goroutine 栈内存**：Go 协程初始栈在 Go 1.4 后固定为 2KB，但在 Go 1.25+ 时代，对于长时间阻塞在系统调用（如 epoll wait）上的空闲协程，Go runtime 会进行**栈收缩（Stack Shrinking）**，甚至能将闲置栈压缩到几十字节。但在活跃期，300万连接 × 2协程 × 2KB 仍会占用理论上的 **12 GB** 虚拟内存。
+2. **I/O 缓冲区内存**：`bufio` 默认 4KB。如果每个连接独占，需要 **24 GB**。虽然现代实践可通过 `sync.Pool` 复用，但在 `net/http` 原生的一读一写模型下，如果长连接一直保持 Read 阻塞，这个 4KB 的 buffer 实际上是**无法归还给 Pool 的**，因此这 24GB 是硬开销。
+3. **调度与 GC 开销**：这是 Go 1.25+ 时代最大的瓶颈。尽管 Go 1.25 的 GC 已经优化到极高的水平，但 GC 的标记阶段（Mark Phase）依然需要扫描这 **600万个协程的栈（即使是空闲的）**。这会导致 GC 停顿和 CPU 占用飙升。
+
+> 💡 **结论**：在现代 Go 中，原生模型维持 300 万连接的内存开销约 **30GB+**（栈 + 无法释放的 bufio）。但真正致命的不再是内存大小，而是**海量 Goroutine 带来的调度器（Scheduler）压力和 GC 标记时间**，这会导致单机 CPU 迅速打满。
+
+### 7.3 核心架构优化方案
+
+为了压榨单机极限，必须绕过“一连接一 Goroutine”的限制：
+
+- **引入 Netpoll (非阻塞 I/O)**：利用如 CloudWeGo `netpoll` 或 `nbio` 等现代网络框架。仅在 Socket 有可读事件时，才唤醒处理，消除阻塞等待。
+- **消除常驻 Goroutine (按需分配)**：将每个连接的常驻协程降级为 **0**。读写事件发生时交由协程池处理，极大减轻 GC 扫描栈帧的负担。
+- **Goroutine 资源池化与依赖注入**：通过结构体注入配置，强制传递 `context.Context` 控制生命周期，避免全局变量。
+- **Zero-copy Upgrade**：绕过 `net/http` Header 解析，使用 `gobwas/ws` 等库在裸 TCP 上实现零拷贝升级。
+
+### 7.4 现代高并发 Server 代码骨架
+
+严格遵循依赖注入、显式错误处理和 Context 传递。鉴权失败时只断开当前连接，不中断主服务。
+
+```go
+import (
+    "context"
+    "fmt"
+    "net"
+    "time"
+    
+    "github.com/gobwas/ws"
+    // 假设引入现代协程池(gopool)和 netpoll 库
+)
+
+// Config 定义服务器配置，通过注入方式传递，不硬编码端口或容量
+type Config struct {
+    MaxWorkers int
+    Address    string
+}
+
+// Server 结构体封装服务状态，遵循依赖注入，避免全局变量
+type Server struct {
+    config Config
+    pool   *gopool.Pool
+    poller *netpoll.Poller
+}
+
+// NewServer 依赖注入（构造函数模式）
+func NewServer(cfg Config) *Server {
+    return &Server{
+        config: cfg,
+        pool:   gopool.New(cfg.MaxWorkers),
+    }
+}
+
+// Start 启动 WebSocket 服务，阻塞调用必须接受 context.Context
+func (s *Server) Start(ctx context.Context) error {
+    ln, err := net.Listen("tcp", s.config.Address)
+    if err != nil {
+        return fmt.Errorf("failed to listen on %s: %w", s.config.Address, err)
+    }
+    defer ln.Close()
+
+    // 监听 Context 退出信号，实现优雅停机
+    go func() {
+        <-ctx.Done()
+        ln.Close()
+    }()
+
+    for {
+        // 使用协程池调度 Accept，防止雪崩
+        err := s.pool.ScheduleTimeout(time.Millisecond, func() {
+            conn, acceptErr := ln.Accept()
+            if acceptErr != nil {
+                return
+            }
+
+            // 零拷贝升级与鉴权
+            if _, upgradeErr := ws.Upgrade(conn); upgradeErr != nil {
+                // logger.Warn("upgrade failed", "err", upgradeErr)
+                conn.Close() // 密钥或鉴权失败，记录错误并关闭连接，不中断服务
+                return
+            }
+
+            ch := NewChannel(ctx, conn)
+
+            // 注册可读事件（适配现代 netpoll 库的 API）
+            s.poller.Start(conn, netpoll.EventRead, func() {
+                s.pool.Schedule(func() {
+                    // 传递 ctx 处理链路追踪与级联超时
+                    if err := ch.Receive(ctx); err != nil {
+                        // 显式处理错误，绝对不可使用 _ = xxx() 忽略
+                        conn.Close()
+                    }
+                })
+            })
+        })
+
+        if err != nil {
+            // 协程池满负荷，执行退避策略
+            time.Sleep(10 * time.Millisecond)
+        }
+    }
+}
+```
+
+### 7.5 专家级架构思考
+
+1. **标准库足够好 (Good Enough)**：对于 10万~50万 并发，直接使用 `net/http` 配合 `sync.Pool` 复用 Buffer 是性价比最高、开发最快的方案。除非目标是百万级以上，否则别引入底层 epoll 的复杂度。
+2. **瓶颈转移 (内存墙 -> CPU与GC墙)**：现代高并发真正的挑战是 **CPU 调度**和 **GC 停顿 (STW/Mark)**。使用 netpoll 的最大收益是减轻了 GC 扫描数百万个 Goroutine 栈的负担。
+3. **架构规范落地**：
+    - **禁止 init() 滥用**：必须通过构造函数将 `Config` 注入给核心实例。
+    - **防御性编程**：握手失败、客户端异常等情况，必须将错误限制在当前连接域内，安全 `Close()` 并继续 `Accept`，**绝不可在业务逻辑中使用 panic**。

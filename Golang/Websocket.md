@@ -3,9 +3,8 @@
 ### 1.1 WebSocket 的本质：基于 HTTP 的升级协议
 
 - **核心结论**：WebSocket **不是全新应用层协议**，而是**基于 HTTP 的升级机制**（RFC 6455）。
-- **关键设计**：
-    - **握手阶段**：完全依赖 HTTP 协议（`Upgrade: websocket` + `Connection: Upgrade`）。
-    - **数据传输阶段**：切换为自定义帧格式（2-14 字节头部），**脱离 HTTP**。
+- **关键设计（握手阶段）**：完全依赖 HTTP 协议（`Upgrade: websocket` + `Connection: Upgrade`）。
+- **关键设计（数据传输阶段）**：切换为自定义帧格式（2-14 字节头部），**脱离 HTTP**。
 - **RFC 依据**：RFC 6455 Section 1.2 明确说明 _"The WebSocket protocol is designed to be implemented within the context of HTTP."_
 
 > 💡 **设计哲学**：  
@@ -71,9 +70,8 @@
 ### 2.2 背压（Backpressure）：高并发服务的生存线
 
 - **定义**：当服务端发送速度 > 客户端处理速度 → **通道满时主动关闭连接**（而非阻塞）。
-- **为什么必须？**
-    - 通道满时阻塞 → Goroutine 持续等待 → **CPU 资源浪费 + 内存持续增长** → **服务崩溃**。
-    - **实测数据**：10k 连接，通道缓冲区 1024 → 内存占用 512GB（崩溃）；通道满时关闭 → 内存稳定在 1.2GB。
+- **必要性（问题）**：通道满时阻塞会导致 Goroutine 持续等待，造成 CPU 资源浪费与内存持续增长，最终导致服务崩溃。
+- **必要性（数据）**：实测 10k 连接，通道缓冲区 1024 时内存占用 512GB（崩溃）；若通道满时关闭，内存稳定在 1.2GB。
 - **工程实现**：
     
     ```go
@@ -201,33 +199,27 @@
 
 ### 1. 基础阶段：理解协议设计
 
-- **必须掌握**：
-    - 握手过程（`Upgrade`/`Connection` 头的严格要求）
-    - 帧结构（FIN/Opcode/MASK 字段设计原因）
-    - RFC 6455 Section 1.2 和 Section 5
-- **验证方式**：
-    - 用 `curl` 测试握手（故意配置错误头观察 HTTP 400）
-    - 用 Wireshark 分析 WebSocket 帧
+- **必须掌握**：握手过程（`Upgrade`/`Connection` 头的严格要求）。
+- **必须掌握**：帧结构（FIN/Opcode/MASK 字段设计原因）。
+- **必须掌握**：RFC 6455 Section 1.2 和 Section 5。
+- **验证方式**：用 `curl` 测试握手（故意配置错误头观察 HTTP 400）。
+- **验证方式**：用 Wireshark 分析 WebSocket 帧。
 
 ### 2. 进阶阶段：工程实践
 
-- **必须掌握**：
-    - 背压实现（通道满时的优雅关闭）
-    - 心跳保活（`pingPeriod = (pongWait * 9) / 10` 的计算逻辑）
-    - 企业级 Nginx 配置
-- **验证方式**：
-    - 模拟慢速客户端测试内存占用
-    - 用 `netstat` 观察连接状态
+- **必须掌握**：背压实现（通道满时的优雅关闭）。
+- **必须掌握**：心跳保活（`pingPeriod = (pongWait * 9) / 10` 的计算逻辑）。
+- **必须掌握**：企业级 Nginx 配置。
+- **验证方式**：模拟慢速客户端测试内存占用。
+- **验证方式**：用 `netstat` 观察连接状态。
 
 ### 3. 专家阶段：架构决策
 
-- **必须掌握**：
-    - WebSocket 与 Streamable HTTP 的对比
-    - 云原生架构中的协议选择（AI Agent 场景）
-    - RFC 6455 安全设计（`MASK` 字段、`Sec-WebSocket-Key` 验证）
-- **验证方式**：
-    - 分析生产环境故障日志（如握手失败日志）
-    - 比较 MCP 架构中 WebSocket 与 Streamable HTTP 的部署成本
+- **必须掌握**：WebSocket 与 Streamable HTTP 的对比。
+- **必须掌握**：云原生架构中的协议选择（AI Agent 场景）。
+- **必须掌握**：RFC 6455 安全设计（`MASK` 字段、`Sec-WebSocket-Key` 验证）。
+- **验证方式**：分析生产环境故障日志（如握手失败日志）。
+- **验证方式**：比较 MCP 架构中 WebSocket 与 Streamable HTTP 的部署成本。
 
 ---
 
@@ -242,6 +234,8 @@
 
 ## 六、源码级深度剖析：基于 x/net/websocket
 *(源码路径：`golang.org/x/net/websocket`)*
+
+> ⚠️ **专家批注**：`golang.org/x/net/websocket` 官方已停止维护（Frozen），存在无法处理控制帧、缺乏 Context 支持等设计缺陷。生产环境强烈建议使用 `github.com/gorilla/websocket`（标准库平替）或 `nhooyr.io/websocket`（现代设计），追求极致性能时使用 `github.com/gobwas/ws`。本章源码剖析仅作学习协议底层机制之用。
 
 ### 6.1 怎么建立连接 (Handshake)
 WebSocket 连接的建立本质上是一个 HTTP 升级过程。`x/net/websocket` 通过劫持 (Hijack) 原始 HTTP 连接来实现。
@@ -471,6 +465,7 @@ func writePump(ws *websocket.Conn) {
 import (
     "context"
     "fmt"
+    "log/slog"
     "net"
     "time"
     
@@ -489,13 +484,15 @@ type Server struct {
     config Config
     pool   *gopool.Pool
     poller *netpoll.Poller
+    logger *slog.Logger
 }
 
 // NewServer 依赖注入（构造函数模式）
-func NewServer(cfg Config) *Server {
+func NewServer(cfg Config, logger *slog.Logger) *Server {
     return &Server{
         config: cfg,
         pool:   gopool.New(cfg.MaxWorkers),
+        logger: logger,
     }
 }
 
@@ -507,9 +504,12 @@ func (s *Server) Start(ctx context.Context) error {
     }
     defer ln.Close()
 
+    s.logger.Info("websocket server started", "address", s.config.Address)
+
     // 监听 Context 退出信号，实现优雅停机
     go func() {
         <-ctx.Done()
+        s.logger.Info("shutting down websocket server")
         ln.Close()
     }()
 
@@ -523,7 +523,8 @@ func (s *Server) Start(ctx context.Context) error {
 
             // 零拷贝升级与鉴权
             if _, upgradeErr := ws.Upgrade(conn); upgradeErr != nil {
-                // logger.Warn("upgrade failed", "err", upgradeErr)
+                // 记录英文日志并继续，不中断服务
+                s.logger.Warn("websocket upgrade failed", "error", upgradeErr, "remote_addr", conn.RemoteAddr().String())
                 conn.Close() // 密钥或鉴权失败，记录错误并关闭连接，不中断服务
                 return
             }
@@ -535,7 +536,8 @@ func (s *Server) Start(ctx context.Context) error {
                 s.pool.Schedule(func() {
                     // 传递 ctx 处理链路追踪与级联超时
                     if err := ch.Receive(ctx); err != nil {
-                        // 显式处理错误，绝对不可使用 _ = xxx() 忽略
+                        // 显式处理错误，记录英文日志，绝不忽略
+                        s.logger.Debug("connection closed or receive error", "error", err, "remote_addr", conn.RemoteAddr().String())
                         conn.Close()
                     }
                 })
@@ -544,6 +546,7 @@ func (s *Server) Start(ctx context.Context) error {
 
         if err != nil {
             // 协程池满负荷，执行退避策略
+            s.logger.Warn("worker pool exhausted, backing off")
             time.Sleep(10 * time.Millisecond)
         }
     }

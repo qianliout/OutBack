@@ -64,13 +64,13 @@ Skills是一个 `SKILL.md` 文件，里面写着某个领域的专业知识和�
 
 ### 🏆 开发工作流类
 
-| 排名 | Skill名称 | 热度 | 功能介绍 |
-| --- | --- | --- | --- |
-| 1 | create-pr | 169.7k | 自动创建GitHub PR，格式化标题，通过CI校验 |
-| 2 | skill-lookup | 142.6k | 技能查找与安装器，问什么Skills都能找到 |
-| 3 | frontend-code-review | 126.3k | 前端代码审查，支持tsx/ts/js文件检查清单 |
-| 4 | component-refactoring | 126.3k | 组件重构专家，安全拆分和优化React组件 |
-| 5 | github-code-review | 48.2k | GitHub代码审查+AI协调，多Agent协同评审 |
+| 排名  | Skill名称               | 热度     | 功能介绍                       |
+| --- | --------------------- | ------ | -------------------------- |
+| 1   | create-pr             | 169.7k | 自动创建GitHub PR，格式化标题，通过CI校验 |
+| 2   | skill-lookup          | 142.6k | 技能查找与安装器，问什么Skills都能找到     |
+| 3   | frontend-code-review  | 126.3k | 前端代码审查，支持tsx/ts/js文件检查清单   |
+| 4   | component-refactoring | 126.3k | 组件重构专家，安全拆分和优化React组件      |
+| 5   | github-code-review    | 48.2k  | GitHub代码审查+AI协调，多Agent协同评审 |
 
 ### 🧠 AI/LLM开发类
 

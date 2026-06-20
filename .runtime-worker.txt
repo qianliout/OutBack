@@ -1,0 +1,7 @@
+containerd github.com/containerd/containerd/v2 2.2.1 
+v1.33.13
+enabled
+active
+enabled
+inactive
+bash: line 1: crictl: command not found
